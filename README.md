@@ -68,3 +68,8 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+After running: npx hardhat run --network ropsten scripts/nft2_deploy.js
+Nft deployed to: 0xAfEC9993c5c27B218712B7F76e395b08384E63Cf
