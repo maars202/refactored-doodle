@@ -1,19 +1,22 @@
-import logo from './logo.svg'
+
 import React, { Component } from 'react'
 import Web3 from 'web3'
-import './App.css'
 import { ethers } from 'ethers'
 import axios from 'axios'
-import Navbar from "./components2/NavigationBar"
+import Navbar from "../components2/NavigationBar"
 
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Link } from "react-router-dom";
 
-// NFT_ADDRESS, NFT_ABI
-import { NFT_ADDRESS, NFT_ABI} from './blockchainconfig'
+// reduxsupport:
+import { setMarketNfts, setMyNfts } from '../features/marketItemsSlice';
+import { useDispatch, connect } from 'react-redux';
 
-class App extends Component {
+// NFT_ADDRESS, NFT_ABI
+import { NFT_ADDRESS, NFT_ABI} from '../blockchainconfig'
+
+class Home extends Component {
   componentWillMount() {
     this.loadBlockchainData()
   }
@@ -37,24 +40,17 @@ class App extends Component {
 
   async itempromisemapping(data){
     console.log("reached item promising")
-    // const data2 = [1,2,3]
     const dataitems = await Promise.all(data.slice(0, data.length - 2).map(async (i) => {
-      // console.log("this.state.tokenContract: ", this.state.tokenContract)
-
       // tokenURI is a inherited method of ERC721URIStorage contract: that gives content in nft like string
       const tokenUri = await this.state.tokenContract.methods.tokenURI(i.tokenId).call()
-      // console.log("rendering tokenid: ", i.tokenId, typeof(i.tokenId))
-      // console.log("i: ", i)
-      // const meta = await axios.get(tokenUri)
-      // console.log("meta",meta)
-      // let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
+      let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
       let item = {
         img:tokenUri,
         name: i.name,
         tokenId: parseInt(i.tokenId),
         seller: i.seller,
         owner: i.owner,
-        price: parseInt(i.price),
+        price: price,
         sold: i.sold,
         amountLeft: parseInt(i.amountLeft),
         startDate: i.startDate,
@@ -62,15 +58,6 @@ class App extends Component {
         bedrooms: parseInt(i.bedrooms),
         showers: parseInt(i.showers),
         area: parseInt(i.area)
-
-        // name: meta.data.name, 
-        // description: meta.data.name, 
-        // price,
-        // tokenId: Number(i.tokenId),
-        // seller: i.seller,
-        // owner: i.owner,
-        // sold: i.sold,
-        // image: meta.data.image,
       }
       return item
     }))
@@ -97,6 +84,8 @@ class App extends Component {
     console.log("revealCurrentTokens data: ", data)
     const items = await this.itempromisemapping(data)
     console.log("items collated: ", items)
+
+    this.props.setMarketNfts(items)
     /* create a filtered array of items that have been sold */
 
 
@@ -119,7 +108,7 @@ class App extends Component {
                 <h1>H.O.M.E</h1>
                 <h5>Happiness, Ownership
                 Memories, Everything</h5>
-                <Link to={"/"}>
+                <Link to={"/listings"}>
                 <div style={{backgroundColor:"white", height:"80px", width:"100%", borderRadius: "20px", color: "black", fontSize:"40px", justifyContent: "center", padding:"4px"}}>
                 <p style={{ fontFamily: "DM Sans",
                 // fontStyle: normal,
@@ -162,4 +151,29 @@ backgroundImage: "url(" + "/homebackground.png" + ")",
 }
 
 
-export default App;
+
+
+const mapStateToProps = (state) => {
+  return {
+    marketNfts: state.marketNfts,
+    mynfts: state.mynfts,
+  }
+
+}
+
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setMarketNfts: (action) => dispatch(setMarketNfts(action)),
+    setMyNfts: (action) => dispatch(setMyNfts(action))
+  }
+
+}
+
+// export default Home;
+export default connect(mapStateToProps, mapDispatchToProps)(Home)
+
+
+
+
+
